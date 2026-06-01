@@ -1,0 +1,13 @@
+venv/
+mlartifacts/
+mlflow.db
+__pycache__/
+.ipynb_checkpoints/
+prometheus-3.5.0.linux-amd64/
+prometheus-3.5.0.linux-amd64.tar.gz
+
+mlruns/
+data/
+*.db
+
+__pycache__/
