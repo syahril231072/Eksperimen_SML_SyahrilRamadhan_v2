@@ -1,0 +1,13 @@
+Workflow CI menggunakan GitHub Actions.
+
+Workflow akan berjalan otomatis setiap terjadi push ke branch main.
+
+Tahapan workflow:
+
+1. Checkout repository
+2. Setup Python 3.12
+3. Install dependencies dari requirements.txt
+4. Menjalankan automate_SyahrilRamadhan.py
+5. Melakukan training model secara otomatis
+
+Workflow berhasil dijalankan dan dapat dilihat pada tab Actions GitHub.
