@@ -3,71 +3,49 @@
 # ==========================================
 
 import pandas as pd
-import joblib
+import mlflow
+import mlflow.sklearn
 
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import (
+    accuracy_score,
+    precision_score,
+    recall_score,
+    f1_score
+)
 
 # ==========================================
-# LOAD DATASET
+# CONFIGURATION
 # ==========================================
+
+DATA_PATH = (
+    "preprocessing/"
+    "loan_approval_preprocessed.csv"
+)
+
+EXPERIMENT_NAME = (
+    "Loan_Approval_Automation"
+)
+
+# ==========================================
+# LOAD PREPROCESSED DATASET
+# ==========================================
+
+print(
+    "Loading preprocessed dataset..."
+)
 
 df = pd.read_csv(
-    "loan_approval_dataset.csv"
+    DATA_PATH
 )
 
-df.columns = df.columns.str.strip()
-
-# ==========================================
-# DROP ID COLUMN
-# ==========================================
-
-df.drop(
-    columns=["loan_id"],
-    inplace=True
+print(
+    f"Dataset shape: {df.shape}"
 )
 
 # ==========================================
-# TARGET ENCODING
-# ==========================================
-
-df["loan_status"] = (
-    df["loan_status"]
-    .str.strip()
-)
-
-df["loan_status"] = df["loan_status"].map({
-    "Approved": 1,
-    "Rejected": 0
-})
-
-# ==========================================
-# FEATURE ENCODING
-# ==========================================
-
-df["education"] = (
-    df["education"]
-    .str.strip()
-)
-
-df["self_employed"] = (
-    df["self_employed"]
-    .str.strip()
-)
-
-df = pd.get_dummies(
-    df,
-    columns=[
-        "education",
-        "self_employed"
-    ],
-    drop_first=True
-)
-
-# ==========================================
-# SPLIT DATA
+# FEATURE TARGET SPLIT
 # ==========================================
 
 X = df.drop(
@@ -77,70 +55,107 @@ X = df.drop(
 
 y = df["loan_status"]
 
-X_train, X_test, y_train, y_test = train_test_split(
-    X,
-    y,
-    test_size=0.2,
-    random_state=42,
-    stratify=y
+# ==========================================
+# TRAIN TEST SPLIT
+# ==========================================
+
+X_train, X_test, y_train, y_test = (
+    train_test_split(
+        X,
+        y,
+        test_size=0.2,
+        random_state=42,
+        stratify=y
+    )
 )
 
 # ==========================================
-# SCALING
+# MLFLOW CONFIGURATION
 # ==========================================
 
-scaler = StandardScaler()
-
-X_train = scaler.fit_transform(
-    X_train
+mlflow.set_tracking_uri(
+    "http://127.0.0.1:5000"
 )
 
-X_test = scaler.transform(
-    X_test
+mlflow.set_experiment(
+    EXPERIMENT_NAME
 )
+
+# WAJIB SESUAI REVIEWER
+mlflow.sklearn.autolog()
 
 # ==========================================
-# TRAIN MODEL
+# TRAINING
 # ==========================================
 
-model = RandomForestClassifier(
-    random_state=42
-)
+with mlflow.start_run():
 
-model.fit(
-    X_train,
-    y_train
-)
+    print(
+        "Training Random Forest model..."
+    )
 
-# ==========================================
-# EVALUATION
-# ==========================================
+    model = RandomForestClassifier(
+        n_estimators=300,
+        max_depth=20,
+        min_samples_split=2,
+        random_state=42
+    )
 
-pred = model.predict(
-    X_test
-)
+    model.fit(
+        X_train,
+        y_train
+    )
 
-accuracy = accuracy_score(
-    y_test,
-    pred
+    # ======================================
+    # EVALUATION
+    # ======================================
+
+    y_pred = model.predict(
+        X_test
+    )
+
+    accuracy = accuracy_score(
+        y_test,
+        y_pred
+    )
+
+    precision = precision_score(
+        y_test,
+        y_pred
+    )
+
+    recall = recall_score(
+        y_test,
+        y_pred
+    )
+
+    f1 = f1_score(
+        y_test,
+        y_pred
+    )
+
+    print("\n========== RESULT ==========")
+
+    print(
+        f"Accuracy  : {accuracy:.4f}"
+    )
+
+    print(
+        f"Precision : {precision:.4f}"
+    )
+
+    print(
+        f"Recall    : {recall:.4f}"
+    )
+
+    print(
+        f"F1 Score  : {f1:.4f}"
+    )
+
+print(
+    "\nTraining completed successfully."
 )
 
 print(
-    f"Accuracy: {accuracy:.4f}"
+    "Artifacts have been logged automatically by MLflow Autolog."
 )
-
-# ==========================================
-# SAVE ARTIFACTS
-# ==========================================
-
-joblib.dump(
-    model,
-    "model.pkl"
-)
-
-joblib.dump(
-    scaler,
-    "scaler.pkl"
-)
-
-print("Model saved successfully")
