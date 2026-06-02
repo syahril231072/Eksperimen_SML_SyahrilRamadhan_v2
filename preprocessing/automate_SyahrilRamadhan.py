@@ -17,7 +17,7 @@ from sklearn.metrics import (
 # CONFIGURATION
 # ==========================================
 
-DATASET_PATH = "datanamadataset_raw/loan_approval_dataset.csv"
+DATASET_PATH = "namadataset_raw/loan_approval_dataset.csv"
 
 MODEL_PATH = "model.pkl"
 
