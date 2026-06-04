@@ -19,11 +19,7 @@ from sklearn.metrics import (
 # CONFIGURATION
 # ==========================================
 
-DATA_PATH = (
-    "preprocessing/"
-    "loan_approval_preprocessed.csv"
-)
-
+DATA_PATH = "loan_approval_preprocessed.csv"
 EXPERIMENT_NAME = (
     "Loan_Approval_Automation"
 )
@@ -35,7 +31,10 @@ EXPERIMENT_NAME = (
 print(
     "Loading preprocessed dataset..."
 )
+import os
 
+print("Current directory:", os.getcwd())
+print("Files:", os.listdir())
 df = pd.read_csv(
     DATA_PATH
 )
@@ -73,9 +72,7 @@ X_train, X_test, y_train, y_test = (
 # MLFLOW CONFIGURATION
 # ==========================================
 
-mlflow.set_tracking_uri(
-    "http://127.0.0.1:5000"
-)
+
 
 mlflow.set_experiment(
     EXPERIMENT_NAME

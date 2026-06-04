@@ -105,6 +105,14 @@ with mlflow.start_run():
         X_train,
         y_train
     )
+    # ======================================
+    # EXPLICIT MODEL LOGGING
+    # ======================================
+
+    mlflow.sklearn.log_model(
+        sk_model=model,
+        artifact_path="model"
+    )
 
     # ======================================
     # EVALUATION
