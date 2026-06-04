@@ -11,3 +11,6 @@ data/
 *.db
 
 __pycache__/
+
+echo "*.tar.gz" >> .gitignore
+echo "*.zip" >> .gitignore
